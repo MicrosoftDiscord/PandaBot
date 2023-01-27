@@ -117,7 +117,7 @@ class Moderation(commands.Cog):
         await ctx.send(f":warning: Successfully **warned** `{member}`!")
 
     @commands.command(name="slowmode", aliases=['sm'])
-    @commands.has_permissions(manage_messages=True)
+    @commands.has_permissions(manage_channels=True)
     async def slowmode(self, ctx, seconds:int=None):
         await ctx.message.delete()
         if not seconds:
@@ -126,7 +126,7 @@ class Moderation(commands.Cog):
         await ctx.send(f"Changed slowmode to {seconds} seconds.")
 
     @commands.command(name="delwarn", brief="Deletes a warning.")
-    @commands.has_permissions(manage_messages=True)
+    @commands.has_permissions(manage_roles=True)
     async def unwarn(self, ctx, id:int):
         """Deletes a member's warnings with the warn ID."""
         await ctx.message.delete()
@@ -144,7 +144,7 @@ class Moderation(commands.Cog):
         await ctx.reply(embed=embed)
 
     @commands.command(name="clearwarn", brief="Clears all warns for a user", aliases=["clearwarns"])
-    @commands.has_permissions(manage_channels=True)
+    @commands.has_permissions(administrator=True)
     async def clearwarn(self, ctx, member:discord.Member):
         """Clears all warnings a member has."""
         await ctx.message.delete()
@@ -158,7 +158,6 @@ class Moderation(commands.Cog):
         await ctx.reply(embed=embed)
 
     @commands.command(name="warnings", brief="Shows all warnings of a member", aliases=['warns'])
-    @commands.has_permissions(manage_messages=True)
     async def warnings(self, ctx, member:discord.Member):
         """Shows all warnings a member has"""
         res = await self.bot.conn.fetchall("SELECT * FROM warns WHERE user_id=?", (member.id,))
@@ -198,7 +197,7 @@ class Moderation(commands.Cog):
         await ctx.send(s_str)
 
     @commands.command(name="unlockdown", brief="Unlocks all channels")
-    @commands.has_permissions(manage_messages=True)
+    @commands.has_permissions(manage_roles=True)
     async def unlock_all(self, ctx):
         """Unlocks all channels that are currently locked down."""
         res = await self.bot.conn.fetchall("SELECT * FROM lockdown")
@@ -274,7 +273,7 @@ class Moderation(commands.Cog):
         await ctx.send("Mute role updated.")
     
     @commands.command(name="mute", brief="Mutes a member")
-    @commands.has_permissions(manage_messages=True)
+    @commands.has_permissions(manage_roles=True)
     async def mute(self, ctx, member:discord.Member, *, reason="No reason provided"):
         """Adds the muted role to a member"""
         role = ctx.guild.get_role(int(os.environ.get("MUTE_ROLE_ID")))
@@ -284,7 +283,7 @@ class Moderation(commands.Cog):
         await ctx.send(f":mute: Successfully **muted**  `{member}`!")
     
     @commands.command(name="unmute", brief="Unmutes a member")
-    @commands.has_permissions(manage_messages=True)
+    @commands.has_permissions(manage_roles=True)
     async def unmute(self, ctx, member:discord.Member):
         """Removes the muted role from a member"""
         role = ctx.guild.get_role(int(os.environ.get("MUTE_ROLE_ID")))
@@ -300,7 +299,7 @@ class Moderation(commands.Cog):
         await member.remove_roles(role)
 
     @commands.command(name="tempmute", brief="Temporarily mutes a member")
-    @commands.has_permissions(manage_messages=True)
+    @commands.has_permissions(manage_roles=True)
     async def tempmute(self, ctx, member:discord.Member, delta:TimeConverter, *, reason="No reason provided"):
         """Mutes a member, waits until the given time before unmuting."""
         role = ctx.guild.get_role(int(os.environ.get("MUTE_ROLE_ID")))
